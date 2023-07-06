@@ -115,7 +115,6 @@ export const App = () => {
                   <i
                     className="fas fa-search"
                     aria-hidden="true"
-                    onClick={() => setQuery('')}
                   />
                 </span>
 
@@ -125,6 +124,7 @@ export const App = () => {
                     data-cy="ClearButton"
                     type="button"
                     className="delete"
+                    onClick={() => setQuery('')}
                   />
                 </span>
               </p>
