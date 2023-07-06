@@ -22,7 +22,7 @@ export const products = productsFromServer.map(product => ({
   user: getUserById(getCategoryById(product.categoryId).ownerId),
 }));
 
-export function getProducts(goods, selected, query) {
+export function getProducts(goods, selectedUser, query, selectedCategory) {
   let filteredProducts = goods;
 
   if (query) {
@@ -33,20 +33,38 @@ export function getProducts(goods, selected, query) {
     );
   }
 
-  // if (selected !== 'all') {
-  //   filteredProducts = filteredProducts.filter(good {
-  //     return good.user.id = selected;
-  //   });
-  // }
+  if (selectedUser !== '') {
+    filteredProducts = filteredProducts.filter(
+      product => product.user.id === selectedUser,
+    );
+  }
+
+  if (selectedCategory !== '') {
+    filteredProducts = filteredProducts.filter(
+      products.categoryId === selectedCategory,
+    );
+  }
 
   return filteredProducts;
 }
 
 export const App = () => {
-  const [selectedUser, setSelecedUser] = useState('all');
+  const [selectedUser, setSelecedUser] = useState('');
   const [query, setQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
-  const visibleProducts = getProducts(products, selectedUser, query);
+  const visibleProducts = getProducts(
+    products,
+    selectedUser,
+    query,
+    selectedCategory,
+  );
+
+  function resetFilters() {
+    setSelecedUser('');
+    setQuery('');
+    setSelectedCategory('');
+  }
 
   return (
     <div className="section">
@@ -116,6 +134,7 @@ export const App = () => {
                 href="#/"
                 data-cy="AllCategories"
                 className="button is-success mr-6 is-outlined"
+                onClick={() => setSelectedCategory('')}
               >
                 All
               </a>
@@ -126,10 +145,22 @@ export const App = () => {
                   data-cy="Category"
                   className="button mr-2 my-1"
                   href="#/"
+                  onClick={() => setSelectedCategory(category.id)}
                 >
                   {category.title}
                 </a>
               ))}
+            </div>
+
+            <div className="panel-block">
+              <a
+                data-cy="ResetAllButton"
+                href="#/"
+                className="button is-link is-outlined is-fullwidth"
+                onClick={resetFilters}
+              >
+                Reset all filters
+              </a>
             </div>
           </nav>
         </div>
@@ -220,38 +251,6 @@ export const App = () => {
                   </td>
                 </tr>
               ))}
-
-              {/* <tr data-cy="Product">
-                <td className="has-text-weight-bold" data-cy="ProductId">
-                  2
-                </td>
-
-                <td data-cy="ProductName">Bread</td>
-                <td data-cy="ProductCategory">🍞 - Grocery</td>
-
-                <td
-                  data-cy="ProductUser"
-                  className="has-text-danger"
-                >
-                  Anna
-                </td>
-              </tr>
-
-              <tr data-cy="Product">
-                <td className="has-text-weight-bold" data-cy="ProductId">
-                  3
-                </td>
-
-                <td data-cy="ProductName">iPhone</td>
-                <td data-cy="ProductCategory">💻 - Electronics</td>
-
-                <td
-                  data-cy="ProductUser"
-                  className="has-text-link"
-                >
-                  Roma
-                </td>
-              </tr> */}
             </tbody>
           </table>
         </div>
