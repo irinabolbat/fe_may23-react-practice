@@ -18,14 +18,35 @@ export function getUserById(ownerId) {
 
 export const products = productsFromServer.map(product => ({
   ...product,
-  category: getCategoryById(product.categoryId), // find by product.categoryId
-  user: getUserById(getCategoryById(product.categoryId).ownerId), // find by category.ownerId
+  category: getCategoryById(product.categoryId),
+  user: getUserById(getCategoryById(product.categoryId).ownerId),
 }));
 
-// console.log(products);
+export function getProducts(goods, selected, query) {
+  let filteredProducts = goods;
+
+  if (query) {
+    const normalizedQuery = query.toLowerCase();
+
+    filteredProducts = filteredProducts.filter(
+      product => product.name.toLowerCase().startsWith(normalizedQuery),
+    );
+  }
+
+  // if (selected !== 'all') {
+  //   filteredProducts = filteredProducts.filter(good {
+  //     return good.user.id = selected;
+  //   });
+  // }
+
+  return filteredProducts;
+}
 
 export const App = () => {
   const [selectedUser, setSelecedUser] = useState('all');
+  const [query, setQuery] = useState('');
+
+  const visibleProducts = getProducts(products, selectedUser, query);
 
   return (
     <div className="section">
@@ -44,27 +65,20 @@ export const App = () => {
                 All
               </a>
 
-              <a
-                data-cy="FilterUser"
-                href="#/"
-              >
-                User 1
-              </a>
+              {usersFromServer.map(user => (
+                <a
+                  key={`${user.id}-${user.name}`}
+                  data-cy="FilterUser"
+                  href="#/"
+                  className={classNames({
+                    'is-active': selectedUser === user.id,
+                  })}
+                  onClick={() => setSelecedUser(user.id)}
+                >
+                  {user.name}
+                </a>
+              ))}
 
-              <a
-                data-cy="FilterUser"
-                href="#/"
-                className="is-active"
-              >
-                User 2
-              </a>
-
-              <a
-                data-cy="FilterUser"
-                href="#/"
-              >
-                User 3
-              </a>
             </p>
 
             <div className="panel-block">
@@ -74,11 +88,16 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
+                  value={query}
+                  onChange={event => setQuery(event.target.value)}
                 />
 
                 <span className="icon is-left">
-                  <i className="fas fa-search" aria-hidden="true" />
+                  <i
+                    className="fas fa-search"
+                    aria-hidden="true"
+                    onClick={() => setQuery('')}
+                  />
                 </span>
 
                 <span className="icon is-right">
@@ -101,46 +120,16 @@ export const App = () => {
                 All
               </a>
 
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 3
-              </a>
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 4
-              </a>
-            </div>
-
-            <div className="panel-block">
-              <a
-                data-cy="ResetAllButton"
-                href="#/"
-                className="button is-link is-outlined is-fullwidth"
-              >
-                Reset all filters
-              </a>
+              {categoriesFromServer.map(category => (
+                <a
+                  key={`${category.id}-${category.title}`}
+                  data-cy="Category"
+                  className="button mr-2 my-1"
+                  href="#/"
+                >
+                  {category.title}
+                </a>
+              ))}
             </div>
           </nav>
         </div>
@@ -207,7 +196,7 @@ export const App = () => {
             </thead>
 
             <tbody>
-              {products.map(product => (
+              {visibleProducts.map(product => (
                 <tr data-cy="Product" key={`${product.id}-${product.name}`}>
                   <td className="has-text-weight-bold" data-cy="ProductId">
                     {product.id}
@@ -269,4 +258,4 @@ export const App = () => {
       </div>
     </div>
   );
-}
+};
