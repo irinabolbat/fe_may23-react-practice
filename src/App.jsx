@@ -79,6 +79,7 @@ export const App = () => {
               <a
                 data-cy="FilterAllUsers"
                 href="#/"
+                onClick={() => setSelecedUser('')}
               >
                 All
               </a>
